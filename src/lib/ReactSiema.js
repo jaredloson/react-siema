@@ -4,22 +4,6 @@ import debounce from './utils/debounce';
 import transformProperty from './utils/transformProperty';
 
 class ReactSiema extends Component {
-    static propTypes = {
-        resizeDebounce: PropTypes.number,
-        duration: PropTypes.number,
-        easing: PropTypes.string,
-        perPage: PropTypes.number,
-        startIndex: PropTypes.number,
-        draggable: PropTypes.bool,
-        threshold: PropTypes.number,
-        loop: PropTypes.bool,
-        children: PropTypes.oneOfType([
-            PropTypes.element,
-            PropTypes.arrayOf(PropTypes.element)
-        ]),
-        onInit: PropTypes.func,
-        onChange: PropTypes.func,
-    };
 
     events = [
         'onTouchStart', 'onTouchEnd', 'onTouchMove', 'onMouseDown', 'onMouseUp', 'onMouseLeave', 'onMouseMove', 'onClick'
@@ -290,7 +274,7 @@ class ReactSiema extends Component {
         return (
             <div
                 ref={(selector) => this.selector = selector}
-                style={{ overflow: 'hidden' }}
+                className={this.props.className}
                 {...this.events.reduce((props, event) => Object.assign({}, props, { [event]: this[event] }), {})}
             >
                 <div ref={(sliderFrame) => this.sliderFrame = sliderFrame}>
@@ -305,6 +289,28 @@ class ReactSiema extends Component {
             </div>
         );
     }
+}
+
+ReactSiema.PropTypes = {
+    resizeDebounce: PropTypes.number,
+    duration: PropTypes.number,
+    easing: PropTypes.string,
+    perPage: PropTypes.number,
+    startIndex: PropTypes.number,
+    draggable: PropTypes.bool,
+    threshold: PropTypes.number,
+    loop: PropTypes.bool,
+    children: PropTypes.oneOfType([
+        PropTypes.element,
+        PropTypes.arrayOf(PropTypes.element)
+    ]),
+    onInit: PropTypes.func,
+    onChange: PropTypes.func,
+    className: PropTypes.string,
+}
+
+ReactSiema.defaultProps = {
+    className: "",
 }
 
 export default ReactSiema;

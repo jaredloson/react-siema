@@ -38,7 +38,7 @@ class App extends Component {
                         Lightweight and simple carousel wrapper for React based on awesome <a href="https://pawelgrzybek.com/siema/">Siema</a>.
                     </h4>
                     <div className="App-intro__slider">
-                        <ReactSiema ref={(siema) => this.siema = siema} onClick={ this.handleSlideClick }>
+                        <ReactSiema ref={(siema) => this.siema = siema} onClick={ this.handleSlideClick } className="hello world">
                             { this.state.slides.map((slide, index) => {
                                 return (
                                     <Item key={index}>{slide}</Item>
