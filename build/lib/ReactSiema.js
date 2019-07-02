@@ -368,7 +368,7 @@ var ReactSiema = function (_Component) {
     return ReactSiema;
 }(_react.Component);
 
-ReactSiema.PropTypes = {
+ReactSiema.propTypes = {
     resizeDebounce: _propTypes2.default.number,
     duration: _propTypes2.default.number,
     easing: _propTypes2.default.string,

@@ -291,7 +291,7 @@ class ReactSiema extends Component {
     }
 }
 
-ReactSiema.PropTypes = {
+ReactSiema.propTypes = {
     resizeDebounce: PropTypes.number,
     duration: PropTypes.number,
     easing: PropTypes.string,
