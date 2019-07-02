@@ -1,27 +1,12 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import debounce from './utils/debounce';
 import transformProperty from './utils/transformProperty';
 
 class ReactSiema extends Component {
-    static propTypes = {
-        resizeDebounce: PropTypes.number,
-        duration: PropTypes.number,
-        easing: PropTypes.string,
-        perPage: PropTypes.number,
-        startIndex: PropTypes.number,
-        draggable: PropTypes.bool,
-        threshold: PropTypes.number,
-        loop: PropTypes.bool,
-        children: PropTypes.oneOfType([
-            PropTypes.element,
-            PropTypes.arrayOf(PropTypes.element)
-        ]),
-        onInit: PropTypes.func,
-        onChange: PropTypes.func,
-    };
 
     events = [
-        'onTouchStart', 'onTouchEnd', 'onTouchMove', 'onMouseDown', 'onMouseUp', 'onMouseLeave', 'onMouseMove'
+        'onTouchStart', 'onTouchEnd', 'onTouchMove', 'onMouseDown', 'onMouseUp', 'onMouseLeave', 'onMouseMove', 'onClick'
     ];
 
     constructor(props) {
@@ -118,24 +103,32 @@ class ReactSiema extends Component {
         }
     }
 
-    prev() {
+    prev(n = 1, callback) {
         if (this.currentSlide === 0 && this.config.loop) {
             this.currentSlide = this.innerElements.length - this.perPage;
         } else {
-            this.currentSlide = Math.max(this.currentSlide - 1, 0);
+            this.currentSlide = Math.max(this.currentSlide - Number(n), 0);
         }
         this.slideToCurrent();
         this.config.onChange.call(this);
+        
+        if (typeof callback === 'function') {
+            callback();
+        }
     }
 
-    next() {
+    next(n = 1, callback) {
         if (this.currentSlide === this.innerElements.length - this.perPage && this.config.loop) {
             this.currentSlide = 0;
         } else {
-            this.currentSlide = Math.min(this.currentSlide + 1, this.innerElements.length - this.perPage);
+            this.currentSlide = Math.min(this.currentSlide + Number(n), this.innerElements.length - this.perPage);
         }
         this.slideToCurrent();
         this.config.onChange.call(this);
+
+        if (typeof callback === 'function') {
+            callback();
+        }
     }
 
     goTo(index) {
@@ -224,7 +217,8 @@ class ReactSiema extends Component {
         e.preventDefault();
         e.stopPropagation();
         this.pointerDown = true;
-        this.drag.startX = e.pageX;
+        this.drag.start = e.pageX;
+        this.wasDragged = false;
     }
 
     onMouseUp(e) {
@@ -235,8 +229,10 @@ class ReactSiema extends Component {
             webkitTransition: `all ${this.config.duration}ms ${this.config.easing}`,
             transition: `all ${this.config.duration}ms ${this.config.easing}`
         });
-        if (this.drag.endX) {
-            this.updateAfterDrag();
+        if (this.drag.end) {
+           // If drag.end has a value > 0, the slider has been dragged
+           this.wasDragged = true;
+           this.updateAfterDrag();
         }
         this.clearDrag();
     }
@@ -268,24 +264,53 @@ class ReactSiema extends Component {
         }
     }
 
+    onClick(e) {
+        if (!this.wasDragged && this.props.onClick) {
+            this.props.onClick(e);
+        }
+    }
+
     render() {
         return (
             <div
                 ref={(selector) => this.selector = selector}
-                style={{ overflow: 'hidden' }}
+                className={this.props.className}
                 {...this.events.reduce((props, event) => Object.assign({}, props, { [event]: this[event] }), {})}
             >
                 <div ref={(sliderFrame) => this.sliderFrame = sliderFrame}>
                     {React.Children.map(this.props.children, (children, index) =>
                         React.cloneElement(children, {
                             key: index,
-                            style: { float: 'left' }
+                            style: { float: 'left' },
+                            onClick: this.onClick,
                         })
                     )}
                 </div>
             </div>
         );
     }
+}
+
+ReactSiema.PropTypes = {
+    resizeDebounce: PropTypes.number,
+    duration: PropTypes.number,
+    easing: PropTypes.string,
+    perPage: PropTypes.number,
+    startIndex: PropTypes.number,
+    draggable: PropTypes.bool,
+    threshold: PropTypes.number,
+    loop: PropTypes.bool,
+    children: PropTypes.oneOfType([
+        PropTypes.element,
+        PropTypes.arrayOf(PropTypes.element)
+    ]),
+    onInit: PropTypes.func,
+    onChange: PropTypes.func,
+    className: PropTypes.string,
+}
+
+ReactSiema.defaultProps = {
+    className: "",
 }
 
 export default ReactSiema;
